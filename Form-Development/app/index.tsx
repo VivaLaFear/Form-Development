@@ -1,41 +1,50 @@
-import { Pressable, Text, View, StyleSheet } from "react-native";
-import { useRouter } from 'expo-router';
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { router } from "expo-router";
 
-export default function Index() {
-
-  const router = useRouter();
-
+export default function Home() {
   return (
-    <View>
-      <Pressable style={styles.button}
-        onPress={() => router.push('/signup')}>
-        <Text style={styles.buttonText}>Go to Sign Up Page</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Form App</Text>
+
+      <Pressable style={styles.btn} onPress={() => router.push("/signin")}>
+        <Text style={styles.text}>Go to Sign In</Text>
       </Pressable>
 
-      <Pressable style={styles.button}
-        onPress={() => router.push('/employee-form')}>
-        <Text style={styles.buttonText}>Go to Employee Form Page</Text>
+      <Pressable style={styles.btn} onPress={() => router.push("/signup")}>
+        <Text style={styles.text}>Go to Sign Up</Text>
       </Pressable>
 
-    </View >
+      <Pressable style={styles.btn} onPress={() => router.push("/employee-form")}>
+        <Text style={styles.text}>Go to Employee Form</Text>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 20,
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "#ffffff",
   },
-  button: {
-    backgroundColor: '#36454F',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+  title: {
+    fontSize: 30,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 28,
+    color: "#111827",
   },
-  buttonText: {
-    color: "#000000",
-    fontSize: 16,
-  }
-})
+  btn: {
+    backgroundColor: "#2563eb",
+    paddingVertical: 16,
+    borderRadius: 14,
+    marginBottom: 16,
+  },
+  text: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+});
