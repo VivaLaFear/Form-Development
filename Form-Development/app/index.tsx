@@ -1,9 +1,11 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import {Auth} from '../components/auth';
 
 export default function Home() {
   return (
     <View style={styles.container}>
+      <Auth/>
       <Text style={styles.title}>Form App</Text>
 
       <Pressable style={styles.btn} onPress={() => router.push("/signin")}>
