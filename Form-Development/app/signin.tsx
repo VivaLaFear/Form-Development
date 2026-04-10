@@ -11,6 +11,8 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 
 const SignInSchema = Yup.object({
   email: Yup.string().email("Enter a valid email").required("Email is required"),
@@ -21,6 +23,7 @@ const SignInSchema = Yup.object({
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
+  const [firebaseError, setFirebaseError] = useState("");
 
   return (
     <View style={styles.container}>
@@ -33,13 +36,30 @@ export default function SignIn() {
         validateOnChange
         validateOnBlur
         onSubmit={async (values, { resetForm, setSubmitting }) => {
-          console.log("Sign In Data:", values);
-
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-
-          setSubmitting(false);
-          resetForm();
-          router.push("/signup");
+          setFirebaseError("");
+          try {
+            await signInWithEmailAndPassword(auth, values.email, values.password);
+            setSubmitting(false);
+            resetForm();
+            router.push("/employee-form");
+          } catch (err: any) {
+            setSubmitting(false);
+            switch (err.code) {
+              case "auth/invalid-credential":
+              case "auth/wrong-password":
+              case "auth/user-not-found":
+                setFirebaseError("Incorrect email or password.");
+                break;
+              case "auth/invalid-email":
+                setFirebaseError("Invalid email address.");
+                break;
+              case "auth/too-many-requests":
+                setFirebaseError("Too many attempts. Please try again later.");
+                break;
+              default:
+                setFirebaseError("Something went wrong. Please try again.");
+            }
+          }
         }}
       >
         {({
@@ -104,6 +124,10 @@ export default function SignIn() {
               <Text style={styles.success}>Looks good</Text>
             ) : null}
 
+            {firebaseError ? (
+              <Text style={styles.error}>{firebaseError}</Text>
+            ) : null}
+
             <Pressable
               style={[
                 styles.button,
@@ -128,7 +152,7 @@ export default function SignIn() {
             </Pressable>
 
             <Pressable onPress={() => router.push("/signup")}>
-              <Text style={styles.link}>Don&apos;t have an account? Go to Sign Up</Text>
+              <Text style={styles.link}>Don't have an account? Go to Sign Up</Text>
             </Pressable>
           </View>
         )}
