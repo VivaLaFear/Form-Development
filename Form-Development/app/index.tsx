@@ -29,9 +29,14 @@ export default function Home() {
         <Text style={styles.text}>Go to Employee Form</Text>
       </Pressable>
 
+      <Pressable style={styles.btn} onPress={() => router.push("/submissions")}>
+        <Text style={styles.text}>View Submissions</Text>
+      </Pressable>
+
       <Pressable style={styles.signOutBtn} onPress={handleSignOut}>
         <Text style={styles.signOutText}>Sign Out</Text>
       </Pressable>
+      
     </View>
   );
 }
