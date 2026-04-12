@@ -11,6 +11,8 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 
 const SignUpSchema = Yup.object({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
@@ -26,6 +28,7 @@ const SignUpSchema = Yup.object({
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [firebaseError, setFirebaseError] = useState("");
 
   return (
     <View style={styles.container}>
@@ -43,13 +46,28 @@ export default function SignUp() {
         validateOnChange
         validateOnBlur
         onSubmit={async (values, { resetForm, setSubmitting }) => {
-          console.log("Sign Up Data:", values);
-
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-
-          setSubmitting(false);
-          resetForm();
-          router.push("/employee-form");
+          setFirebaseError("");
+          try {
+            await createUserWithEmailAndPassword(auth, values.email, values.password);
+            setSubmitting(false);
+            resetForm();
+            router.push("/employee-form");
+          } catch (err: any) {
+            setSubmitting(false);
+            switch (err.code) {
+              case "auth/email-already-in-use":
+                setFirebaseError("This email is already registered.");
+                break;
+              case "auth/invalid-email":
+                setFirebaseError("Invalid email address.");
+                break;
+              case "auth/weak-password":
+                setFirebaseError("Password is too weak.");
+                break;
+              default:
+                setFirebaseError("Something went wrong. Please try again.");
+            }
+          }
         }}
       >
         {({
@@ -168,6 +186,10 @@ export default function SignUp() {
               !errors.confirmPassword &&
               values.confirmPassword ? (
               <Text style={styles.success}>Looks good</Text>
+            ) : null}
+
+            {firebaseError ? (
+              <Text style={styles.error}>{firebaseError}</Text>
             ) : null}
 
             <Pressable

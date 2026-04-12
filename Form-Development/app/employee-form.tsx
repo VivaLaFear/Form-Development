@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { addDoc, collection } from "firebase/firestore";
+import { auth, db } from "../config/firebase";
 
 const EmployeeSchema = Yup.object({
   fullName: Yup.string().min(3, "Minimum 3 characters").required("Full name is required"),
@@ -42,13 +44,19 @@ export default function EmployeeForm() {
         validateOnChange
         validateOnBlur
         onSubmit={async (values, { resetForm, setSubmitting }) => {
-          console.log("Employee Data:", values);
-
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-
-          setSubmitting(false);
-          resetForm();
-          Alert.alert("Success", "Employee form submitted successfully");
+          try {
+            await addDoc(collection(db, "submitted"), {
+              ...values,
+              userId: auth.currentUser?.uid,
+              createdAt: new Date(),
+            });
+            setSubmitting(false);
+            resetForm();
+            Alert.alert("Success", "Employee form submitted successfully");
+          } catch (err) {
+            setSubmitting(false);
+            Alert.alert("Error", "Failed to submit. Please try again.");
+          }
         }}
       >
         {({
