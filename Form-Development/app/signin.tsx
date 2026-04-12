@@ -41,7 +41,7 @@ export default function SignIn() {
             await signInWithEmailAndPassword(auth, values.email, values.password);
             setSubmitting(false);
             resetForm();
-            router.push("/employee-form");
+            router.replace("/");
           } catch (err: any) {
             setSubmitting(false);
             switch (err.code) {
